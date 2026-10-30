@@ -1,0 +1,8 @@
+# Read by Cloudflare Pages (GitHub Pages ignores it; the pages say the same
+# in their own <head>). Nothing here is cached or indexed: the page has to go
+# away the moment Cloudflare points back at the site.
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow
