@@ -25,7 +25,16 @@ that needs no app at all.
   GitHub Pages ignores it and serves the page with 200 (404 for the
   fallback), noindex and no-cache; that is fine for a few hours.
 
-Everything but this README, `_headers` and `functions/` is generated.
+- `wrangler.jsonc`, `src/worker.js`, `.assetsignore`: the same site as a
+  Cloudflare Worker with static assets (see below). The Worker serves the
+  page named by the `STORY` variable (default `brb`) for every path, with
+  a 503 and `Retry-After`; `/brb.html`, `/migration.html` and
+  `/el-nino.html` still show their own story, for previews.
+  `.assetsignore` keeps the repository's own files (this README, the
+  config, `.git`) from being uploaded as public assets.
+
+Everything but this README, `_headers`, `functions/` and the Worker files
+is generated.
 
 ## Changing the story
 
@@ -40,7 +49,43 @@ python manage.py render_brb_static --out ../static-brb --story MIGRATION
 `--story` is one of `EL_NINO`, `MIGRATION` or `BRB`; spelling is forgiven.
 Commit and push the result; the host redeploys from `main`.
 
-## Pointing Cloudflare here
+## Deploying as a Cloudflare Worker
+
+In the dashboard, Workers & Pages, Create, import this repository, with:
+
+- Worker name: `static-brb` (must match `name` in `wrangler.jsonc`)
+- Build command: empty
+- Deploy command: `npx wrangler deploy`
+- Preview command (non-production branches): `npx wrangler preview`,
+  with Enable Preview Builds checked (Settings, Build, Branch control)
+- Root directory: `/`
+
+Pushes to `main` deploy; other branches get a Preview with its own URL.
+Previews read the `previews` block of `wrangler.jsonc` rather than the
+production settings, so they show the default story, `brb`, whatever
+`STORY` says. To change which
+story every path shows, set `STORY` in `wrangler.jsonc` (`brb`,
+`migration` or `el-nino`; `EL_NINO` and the like are forgiven) and push,
+or override it in the dashboard under the Worker's Settings, Variables and
+Secrets. A dashboard override lasts only until the next deploy, which puts
+back the value in `wrangler.jsonc`. Locally, `npx wrangler dev` (add `--var STORY:migration` to try
+another) serves it on `localhost:8787`.
+
+To point the site at it:
+
+1. In the zone's DNS, note the record for `www.fighthealthinsurance.com`
+   (type, target, proxied or not), so it can be put back. If it is a
+   CNAME, delete it: Cloudflare won't add a custom domain over one.
+2. On the Worker's Settings, Domains & Routes, add
+   `www.fighthealthinsurance.com` as a custom domain (and the apex too if
+   it should show the page; each hostname is added on its own). Cloudflare
+   creates the DNS record for it.
+3. When the site is back: remove the custom domain, check the zone's DNS,
+   and recreate the record noted in step 1. Removing the domain doesn't
+   bring the old record back. Its certificate stays behind too; delete it
+   under SSL/TLS, Edge Certificates if it isn't wanted.
+
+## Pointing Cloudflare here (Pages)
 
 The steps as of writing (check the host's docs if the UI has moved):
 
