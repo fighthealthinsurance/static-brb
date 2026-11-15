@@ -9,4 +9,5 @@ package.json
 package-lock.json
 src
 functions
+outage-worker
 README.md
