@@ -21,6 +21,10 @@
     // it in the dashboard under the Worker's Settings, Variables.
     "STORY": "brb"
   },
+  // Worker Previews (branch builds, `npx wrangler preview`) need this block,
+  // even empty. Previews don't inherit production vars, so they show the
+  // Worker's default story, brb, unless STORY is set here too.
+  "previews": {},
   "observability": {
     "enabled": true
   }

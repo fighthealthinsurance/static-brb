@@ -56,20 +56,34 @@ In the dashboard, Workers & Pages, Create, import this repository, with:
 - Worker name: `static-brb` (must match `name` in `wrangler.jsonc`)
 - Build command: empty
 - Deploy command: `npx wrangler deploy`
-- Non-production branch deploy command (the preview command):
-  `npx wrangler versions upload`
+- Preview command (non-production branches): `npx wrangler preview`,
+  with Enable Preview Builds checked (Settings, Build, Branch control)
 - Root directory: `/`
 
-Pushes to `main` deploy; other branches get a preview URL. To change which
+Pushes to `main` deploy; other branches get a Preview with its own URL.
+Previews read the `previews` block of `wrangler.jsonc` rather than the
+production settings, so they show the default story, `brb`, whatever
+`STORY` says. To change which
 story every path shows, set `STORY` in `wrangler.jsonc` (`brb`,
 `migration` or `el-nino`; `EL_NINO` and the like are forgiven) and push,
 or override it in the dashboard under the Worker's Settings, Variables and
-Secrets. Locally, `npx wrangler dev` (add `--var STORY:migration` to try
+Secrets. A dashboard override lasts only until the next deploy, which puts
+back the value in `wrangler.jsonc`. Locally, `npx wrangler dev` (add `--var STORY:migration` to try
 another) serves it on `localhost:8787`.
 
-To point the site at it, on the Worker's Settings, Domains & Routes, add
-`www.fighthealthinsurance.com` as a custom domain; remove it to switch
-back. The Pages steps below work the same way.
+To point the site at it:
+
+1. In the zone's DNS, note the record for `www.fighthealthinsurance.com`
+   (type, target, proxied or not), so it can be put back. If it is a
+   CNAME, delete it: Cloudflare won't add a custom domain over one.
+2. On the Worker's Settings, Domains & Routes, add
+   `www.fighthealthinsurance.com` as a custom domain (and the apex too if
+   it should show the page; each hostname is added on its own). Cloudflare
+   creates the DNS record for it.
+3. When the site is back: remove the custom domain, check the zone's DNS,
+   and recreate the record noted in step 1. Removing the domain doesn't
+   bring the old record back. Its certificate stays behind too; delete it
+   under SSL/TLS, Edge Certificates if it isn't wanted.
 
 ## Pointing Cloudflare here (Pages)
 
