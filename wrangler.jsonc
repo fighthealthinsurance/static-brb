@@ -1,0 +1,27 @@
+// Cloudflare Workers config: the site is served as static assets with a small
+// Worker in front (src/worker.js) that picks the story and sends a 503.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Must match the Worker's name in the Cloudflare dashboard.
+  "name": "static-brb",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // The repository root, minus what .assetsignore leaves out.
+    "directory": ".",
+    "binding": "ASSETS",
+    // Every request goes through the Worker, so every path gets the story.
+    "run_worker_first": true,
+    // Serve /brb.html as /brb.html, no redirects to /brb.
+    "html_handling": "none"
+  },
+  "vars": {
+    // Which page every path shows: brb, migration or el-nino (EL_NINO and
+    // other spellings are forgiven). Change it here and redeploy, or override
+    // it in the dashboard under the Worker's Settings, Variables.
+    "STORY": "brb"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

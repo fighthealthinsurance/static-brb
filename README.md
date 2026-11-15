@@ -25,7 +25,16 @@ that needs no app at all.
   GitHub Pages ignores it and serves the page with 200 (404 for the
   fallback), noindex and no-cache; that is fine for a few hours.
 
-Everything but this README, `_headers` and `functions/` is generated.
+- `wrangler.jsonc`, `src/worker.js`, `.assetsignore`: the same site as a
+  Cloudflare Worker with static assets (see below). The Worker serves the
+  page named by the `STORY` variable (default `brb`) for every path, with
+  a 503 and `Retry-After`; `/brb.html`, `/migration.html` and
+  `/el-nino.html` still show their own story, for previews.
+  `.assetsignore` keeps the repository's own files (this README, the
+  config, `.git`) from being uploaded as public assets.
+
+Everything but this README, `_headers`, `functions/` and the Worker files
+is generated.
 
 ## Changing the story
 
@@ -40,7 +49,29 @@ python manage.py render_brb_static --out ../static-brb --story MIGRATION
 `--story` is one of `EL_NINO`, `MIGRATION` or `BRB`; spelling is forgiven.
 Commit and push the result; the host redeploys from `main`.
 
-## Pointing Cloudflare here
+## Deploying as a Cloudflare Worker
+
+In the dashboard, Workers & Pages, Create, import this repository, with:
+
+- Worker name: `static-brb` (must match `name` in `wrangler.jsonc`)
+- Build command: empty
+- Deploy command: `npx wrangler deploy`
+- Non-production branch deploy command (the preview command):
+  `npx wrangler versions upload`
+- Root directory: `/`
+
+Pushes to `main` deploy; other branches get a preview URL. To change which
+story every path shows, set `STORY` in `wrangler.jsonc` (`brb`,
+`migration` or `el-nino`; `EL_NINO` and the like are forgiven) and push,
+or override it in the dashboard under the Worker's Settings, Variables and
+Secrets. Locally, `npx wrangler dev` (add `--var STORY:migration` to try
+another) serves it on `localhost:8787`.
+
+To point the site at it, on the Worker's Settings, Domains & Routes, add
+`www.fighthealthinsurance.com` as a custom domain; remove it to switch
+back. The Pages steps below work the same way.
+
+## Pointing Cloudflare here (Pages)
 
 The steps as of writing (check the host's docs if the UI has moved):
 
