@@ -36,7 +36,14 @@ export default {
     try {
       response = await fetch(request);
     } catch (err) {
-      if (!pageHost) throw err;
+      if (!pageHost) {
+        // Not rethrown: with passThroughOnException a rethrow would retry the origin, and a
+        // request body that was already sent cannot be sent again.
+        return new Response("Bad gateway\n", {
+          status: 502,
+          headers: { "cache-control": "no-store", "content-type": "text/plain; charset=utf-8" },
+        });
+      }
       return downPage(request);
     }
     // 520-530 are Cloudflare's "origin unreachable / misbehaving" family;

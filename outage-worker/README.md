@@ -15,13 +15,14 @@ bare error screen (on 2026-09-25, for nine hours).
 | anything normal, including the app's own 404 and 500 pages | exactly that, untouched |
 | 502, 503, 504, Cloudflare's 520 to 530, or no connection at all | the "We're down for a moment" page, status 503 |
 | the same failures, but the request is a script or API call (no `text/html` in Accept) | a one-line plain 503 |
-| any failure on a host other than `www`, the bare domain or `dev` | passed through as is |
+| any failure on a host other than `www`, the bare domain or `dev` | passed through as is (a plain 502 if there was no connection at all) |
 
 The 503 carries `Retry-After: 300`, `Cache-Control: no-store` and `X-Robots-Tag: noindex`,
 so nothing caches or indexes the outage page. The `x-fhi-down-page` header says why it was
 shown (the status the site returned, `unreachable`, or `preview`). If the Worker itself
 throws, `passThroughOnException` sends the request on to the site as if the Worker were
-not there.
+not there (Cloudflare cannot resend a request body that was already read, so this is a
+last resort, not a guarantee).
 
 Adding `?fhi-down-page-preview=1` to any address on those hosts shows the page without an
 outage. That request never reaches the site.
