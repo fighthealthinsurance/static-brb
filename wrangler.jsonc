@@ -12,18 +12,18 @@
     "binding": "ASSETS",
     // Every request goes through the Worker, so every path gets the story.
     "run_worker_first": true,
-    // Serve /brb.html as /brb.html, no redirects to /brb.
+    // Serve /el-nino.html as /el-nino.html, no redirects to /el-nino.
     "html_handling": "none"
   },
   "vars": {
-    // Which page every path shows: brb, migration or el-nino (EL_NINO and
-    // other spellings are forgiven). Change it here and redeploy, or override
+    // Which page every path shows: el-nino, migration or brb-pbs (EL_NINO,
+    // BRB and other spellings are forgiven). Change it here and redeploy, or override
     // it in the dashboard under the Worker's Settings, Variables.
-    "STORY": "brb"
+    "STORY": "el-nino"
   },
   // Worker Previews (branch builds, `npx wrangler preview`) need this block,
   // even empty. Previews don't inherit production vars, so they show the
-  // Worker's default story, brb, unless STORY is set here too.
+  // Worker's default story, el-nino, unless STORY is set here too.
   "previews": {},
   "observability": {
     "enabled": true
