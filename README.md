@@ -12,7 +12,7 @@ that needs no app at all.
 - `index.html` and `404.html`: the story the site tells. The 404 copy is
   what GitHub Pages and Cloudflare Pages serve for every other path, so
   a person who arrives at `/scan` sees the page too.
-- `el-nino.html`, `migration.html`, `brb.html`: one page per story, to
+- `el-nino.html`, `migration.html`, `brb-pbs.html`: one page per story, to
   preview the others.
 - `images/`: the pictures the pages use.
 - `_headers`: no-cache and noindex headers, read by Cloudflare Pages
@@ -27,9 +27,9 @@ that needs no app at all.
 
 - `wrangler.jsonc`, `src/worker.js`, `.assetsignore`: the same site as a
   Cloudflare Worker with static assets (see below). The Worker serves the
-  page named by the `STORY` variable (default `brb`) for every path, with
-  a 503 and `Retry-After`; `/brb.html`, `/migration.html` and
-  `/el-nino.html` still show their own story, for previews.
+  page named by the `STORY` variable (default `el-nino`) for every path, with
+  a 503 and `Retry-After`; `/el-nino.html`, `/migration.html` and
+  `/brb-pbs.html` still show their own story, for previews.
   `.assetsignore` keeps the repository's own files (this README, the
   config, `.git`) from being uploaded as public assets.
 
@@ -52,6 +52,8 @@ python manage.py render_brb_static --out ../static-brb --story MIGRATION
 ```
 
 `--story` is one of `EL_NINO`, `MIGRATION` or `BRB`; spelling is forgiven.
+The command writes the PBS story as `brb.html`; here it lives at
+`brb-pbs.html`, so rename it (and delete `brb.html`) before committing.
 Commit and push the result; the host redeploys from `main`.
 
 ## Deploying as a Cloudflare Worker
@@ -67,10 +69,10 @@ In the dashboard, Workers & Pages, Create, import this repository, with:
 
 Pushes to `main` deploy; other branches get a Preview with its own URL.
 Previews read the `previews` block of `wrangler.jsonc` rather than the
-production settings, so they show the default story, `brb`, whatever
+production settings, so they show the default story, `el-nino`, whatever
 `STORY` says. To change which
-story every path shows, set `STORY` in `wrangler.jsonc` (`brb`,
-`migration` or `el-nino`; `EL_NINO` and the like are forgiven) and push,
+story every path shows, set `STORY` in `wrangler.jsonc` (`el-nino`,
+`migration` or `brb-pbs`; `EL_NINO`, `BRB` and the like are forgiven) and push,
 or override it in the dashboard under the Worker's Settings, Variables and
 Secrets. A dashboard override lasts only until the next deploy, which puts
 back the value in `wrangler.jsonc`. Locally, `npx wrangler dev` (add `--var STORY:migration` to try

@@ -1,8 +1,8 @@
 // Cloudflare Workers entry point (wrangler.jsonc). Every request comes here
 // first, because the assets are configured with run_worker_first.
 //
-// - A story page asked for by name (/brb.html, /migration.html,
-//   /el-nino.html) is served as is, so each one can be previewed.
+// - A story page asked for by name (/el-nino.html, /migration.html,
+//   /brb-pbs.html) is served as is, so each one can be previewed.
 // - Any other existing file that is not HTML (the pictures) is served as is.
 // - Everything else, "/" and /scan alike, gets the page named by STORY.
 //
@@ -16,8 +16,10 @@
 // crawled meanwhile. Nothing is cached or indexed, so the page is gone the
 // moment Cloudflare points back at the site.
 
-const STORIES = ["brb", "migration", "el-nino"];
-const DEFAULT_STORY = "brb";
+const STORIES = ["el-nino", "migration", "brb-pbs"];
+const DEFAULT_STORY = "el-nino";
+// The main repository calls the PBS story BRB.
+const ALIASES = { brb: "brb-pbs", pbs: "brb-pbs" };
 
 const NO_CACHE = {
   "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -26,7 +28,7 @@ const NO_CACHE = {
   "X-Robots-Tag": "noindex, nofollow",
 };
 
-// "EL_NINO", "El Nino", "el-nino.html" all mean el-nino.
+// "EL_NINO", "El Nino", "el-nino.html" all mean el-nino; "BRB" means brb-pbs.
 function storyName(value) {
   const name = String(value || "")
     .trim()
@@ -34,7 +36,8 @@ function storyName(value) {
     .replace(/\.html$/, "")
     .replace(/[\s_]+/g, "-")
     .replace(/ñ/g, "n");
-  return STORIES.includes(name) ? name : DEFAULT_STORY;
+  const story = ALIASES[name] || name;
+  return STORIES.includes(story) ? story : DEFAULT_STORY;
 }
 
 function withHeaders(response, status) {
@@ -78,7 +81,7 @@ export default {
 
     if (path !== "/" && !path.endsWith(".html")) {
       const asset = await fetchAsset(env, request, path);
-      // By Content-Type, not the path: /brb.htm%6c can still reach an HTML
+      // By Content-Type, not the path: /el-nino.htm%6c can still reach an HTML
       // file, and HTML always goes out as the story, with its 503.
       if (asset.ok && !isHtml(asset)) {
         return withHeaders(asset);
