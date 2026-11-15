@@ -33,7 +33,12 @@ that needs no app at all.
   `.assetsignore` keeps the repository's own files (this README, the
   config, `.git`) from being uploaded as public assets.
 
-Everything but this README, `_headers`, `functions/` and the Worker files
+- `outage-worker/`: a separate piece, for when the site goes down without
+  warning. A Cloudflare Worker that sits in front of the site and shows a
+  page only when the site cannot be reached. It has its own README.
+
+Everything but this README, `_headers`, `functions/`, the Worker files and
+`outage-worker/`
 is generated.
 
 ## Changing the story

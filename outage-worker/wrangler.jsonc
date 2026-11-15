@@ -1,0 +1,12 @@
+// Deploy settings for the outage Worker. Cloudflare's GitHub connection reads this file
+// (set the Worker's root directory to `outage-worker`).
+//
+// No routes here on purpose: a deploy from this repository must never attach the Worker
+// to a host on its own. Routes are added by hand in the dashboard, dev first (see README.md).
+{
+  "name": "fhi-down-page",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "preview_urls": false
+}
